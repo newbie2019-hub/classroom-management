@@ -4,12 +4,11 @@ namespace App\Http\Livewire;
 
 use App\Models\Professor;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Professors extends Component
 {
-    use WithPagination;
 
+    public $addModal = false;
     public $updateModal = false;
     public $deleteModal = false;
     public $professor = [
@@ -22,7 +21,7 @@ class Professors extends Component
         'email' => '',
     ];
 
-    protected $listeners = ['showUpdateModal', 'showDeleteModal'];
+    protected $listeners = ['showAddModal', 'showUpdateModal', 'showDeleteModal'];
 
     protected $rules = [
         'professor.first_name' => 'required',
@@ -44,6 +43,20 @@ class Professors extends Component
         $this->validateOnly($propertyName);
     }
 
+    public function showAddModal()
+    {
+        $this->professor = [
+            'first_name' => '',
+            'middle_name' => '',
+            'last_name' => '',
+            'gender' => '',
+            'contact' => '',
+            'address' => '',
+            'email' => '',
+        ];
+        $this->addModal = true;
+    }
+
     public function showUpdateModal(Professor $professor)
     {
         $this->professor = $professor;
@@ -61,19 +74,30 @@ class Professors extends Component
         $this->deleteModal = !$this->deleteModal;
     }
 
+    public function updateComponent($msg = '', $title = '', $type = 'success')
+    {
+        $this->emitTo(ProfessorTable::class, 'pg:eventRefresh-default');
+        $this->emit('showToastNotification', ['type' => $type, 'message' => $msg, 'title' => $title]);
+    }
+
+    public function store()
+    {
+        Professor::create($this->professor);
+        $this->addModal = false;
+        $this->updateComponent('Professor\'s data has been created!', 'Created');
+    }
+
     public function update()
     {
         $this->professor->save();
         $this->updateModal = false;
-        $this->emitTo(ProfessorTable::class, 'pg:eventRefresh-default');
-        $this->emit('showToastNotification', ['type' => 'success', 'message' => 'Professor updated successfully!', 'title' => 'Success']);
+        $this->updateComponent('Professor updated successfully!', 'Updated');
     }
 
     public function destroy()
     {
         $this->professor->delete();
         $this->deleteModal = false;
-        $this->emit('showToastNotification', ['type' => 'success', 'message' => 'Professor\'s data was deleted successfully!', 'title' => 'Success']);
-        $this->emitTo(ProfessorTable::class, 'pg:eventRefresh-default');
+        $this->updateComponent('Professor\'s data was deleted successfully!', 'Deleted');
     }
 }

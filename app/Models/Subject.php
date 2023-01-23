@@ -9,4 +9,9 @@ class Subject extends Model
 {
     use HasFactory;
     protected $fillable = ['professor_id', 'subject', 'description', 'units'];
+
+    public function professor()
+    {
+        return $this->belongsTo(Professor::class, 'professor_id', 'id');
+    }
 }

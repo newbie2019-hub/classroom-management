@@ -12,7 +12,8 @@ use PowerComponents\LivewirePowerGrid\{Button, Column, Exportable, Footer, Heade
 final class ProfessorTable extends PowerGridComponent
 {
     use ActionButton;
-
+    public string $sortField = 'created_at';
+    public string $sortDirection = 'desc';
     /*
     |--------------------------------------------------------------------------
     |  Features Setup
@@ -86,6 +87,8 @@ final class ProfessorTable extends PowerGridComponent
     {
         return PowerGrid::eloquent()
             ->addColumn('id')
+            ->addColumn('first_name')
+            ->addColumn('last_name')
             ->addColumn('professor', function (Professor $model) {
                 return e($model->first_name) . ' ' . e($model->last_name);
             })
@@ -115,9 +118,12 @@ final class ProfessorTable extends PowerGridComponent
         return [
             Column::make('ID', 'id')->hidden(),
 
-            Column::make('PROFESSOR', 'professor'),
+            Column::make('FIRST_NAME', 'first_name')->hidden()->searchable(),
+            Column::make('LAST_NAME', 'last_name')->hidden()->searchable(),
+            Column::make('PROFESSOR', 'professor')->searchable(),
 
             Column::make('GENDER', 'gender')
+                ->searchable()
                 ->sortable(),
 
             Column::make('CONTACT', 'contact')
@@ -133,6 +139,16 @@ final class ProfessorTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
+        ];
+    }
+
+    public function header(): array
+    {
+        return [
+            Button::add('create')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring focus:ring-green-200 active:bg-green-600 disabled:opacity-25 transition')
+                ->caption('New Data')
+                ->emitTo('professors', 'showAddModal', []),
         ];
     }
 
@@ -154,12 +170,13 @@ final class ProfessorTable extends PowerGridComponent
     {
         return [
             Button::add('edit')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-100 focus:outline-none focus:border-green-200 focus:ring focus:ring-green-200 active:bg-green-200 disabled:opacity-25 transition')
                 ->caption('Update')
                 ->emitTo('professors', 'showUpdateModal', ['key' => 'id']),
 
             Button::add('destroy')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-100 focus:outline-none focus:border-red-200 focus:ring focus:ring-red-200 active:bg-red-200 disabled:opacity-25 transition')
                 ->caption('Delete')
-                ->class('')
                 ->emitTo('professors', 'showDeleteModal', ['key' => 'id']),
         ];
     }

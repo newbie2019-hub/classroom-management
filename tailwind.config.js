@@ -16,7 +16,14 @@ module.exports = {
             },
         },
     },
-    safelist: ["top-4", 'bg-green-500', 'bg-red-500'],
+    safelist: [
+        "top-4",
+        "whitespace-nowrap",
+        {
+            pattern: /bg-(red|green|blue)-(100|200|300|400|500|600|700)/,
+            variants: ["hover", "focus"],
+        },
+    ],
 
     plugins: [
         require("@tailwindcss/forms")({ strategy: "class" }),

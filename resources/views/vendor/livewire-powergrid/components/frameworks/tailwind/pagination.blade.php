@@ -1,126 +1,168 @@
-@if ($paginator->hasPages())
-    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex justify-between items-center">
-        <div class="flex flex-1 justify-between sm:hidden">
-            @if ($paginator->onFirstPage())
-                <span
-                    class="inline-flex relative items-center px-4 py-2 text-sm font-medium leading-5 text-gray-500 bg-white rounded-md border border-gray-300 cursor-default">
-                    {!! __('pagination.previous') !!}
-                </span>
-            @else
-                <a href="{{ $paginator->previousPageUrl() }}"
-                    class="inline-flex relative items-center px-4 py-2 text-sm font-medium leading-5 text-gray-700 bg-white rounded-md border border-gray-300 ring-gray-300 transition duration-150 ease-in-out hover:text-gray-500 focus:outline-none focus:ring focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
-                    {!! __('pagination.previous') !!}
-                </a>
-            @endif
-
-            @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}"
-                    class="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium leading-5 text-gray-700 bg-white rounded-md border border-gray-300 ring-gray-300 transition duration-150 ease-in-out hover:text-gray-500 focus:outline-none focus:ring focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
-                    {!! __('pagination.next') !!}
-                </a>
-            @else
-                <span
-                    class="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium leading-5 text-gray-500 bg-white rounded-md border border-gray-300 cursor-default">
-                    {!! __('pagination.next') !!}
-                </span>
-            @endif
-        </div>
-
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div class="items-center justify-between sm:flex">
+    <div class="items-center justify-between w-full sm:flex-1 sm:flex">
+        @if ($recordCount === 'full')
             <div>
-                <p class="text-sm leading-5 text-gray-700 mr-3">
-                    {!! __('Showing') !!}
-                    <span class="font-medium">{{ $paginator->firstItem() }}</span>
-                    {!! __('to') !!}
-                    <span class="font-medium">{{ $paginator->lastItem() }}</span>
-                    {!! __('of') !!}
-                    <span class="font-medium">{{ $paginator->total() }}</span>
-                    {!! __('results') !!}
+                <div class="mr-2 leading-5 text-center text-slate-700 text-sm dark:text-slate-300 sm:text-right">
+                    {{ trans('livewire-powergrid::datatable.pagination.showing') }}
+                    <span class="font-semibold firstItem">{{ $paginator->firstItem() }}</span>
+                    {{ trans('livewire-powergrid::datatable.pagination.to') }}
+                    <span class="font-semibold lastItem">{{ $paginator->lastItem() }}</span>
+                    {{ trans('livewire-powergrid::datatable.pagination.of') }}
+                    <span class="font-semibold total">{{ $paginator->total() }}</span>
+                    {{ trans('livewire-powergrid::datatable.pagination.results') }}
+                </div>
+            </div>
+        @elseif($recordCount === 'short')
+            <div>
+                <p class=" leading-5 text-center text-slate-700 text-sm dark:text-slate-300">
+                    <span class="font-semibold firstItem"> {{ $paginator->firstItem() }}</span>
+                    -
+                    <span class="font-semibold lastItem"> {{ $paginator->lastItem() }}</span>
+                    |
+                    <span class="font-semibold total"> {{ $paginator->total() }}</span>
+
                 </p>
             </div>
-
+        @elseif($recordCount === 'min')
             <div>
-                <span class="inline-flex relative z-0 rounded-md shadow-sm">
-                    {{-- Previous Page Link --}}
-                    @if ($paginator->onFirstPage())
-                        <span aria-disabled="true" aria-label="{{ __('pagination.previous') }}">
-                            <span
-                                class="inline-flex relative items-center px-2 py-2 text-sm font-medium leading-5 text-gray-500 bg-white rounded-l-md border border-gray-300 cursor-default"
-                                aria-hidden="true">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        </span>
-                    @else
-                        <a href="{{ $paginator->previousPageUrl() }}" rel="prev"
-                            class="inline-flex relative items-center px-2 py-2 text-sm font-medium leading-5 text-gray-500 bg-white rounded-l-md border border-gray-300 ring-gray-300 transition duration-150 ease-in-out hover:text-gray-400 focus:z-10 focus:outline-none focus:ring focus:border-blue-300 active:bg-gray-100 active:text-gray-500"
-                            aria-label="{{ __('pagination.previous') }}">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <p class="leading-5 text-center text-slate-700 text-sm dark:text-slate-300">
+                    <span class="font-semibold firstItem"> {{ $paginator->firstItem() }}</span>
+                    -
+                    <span class="font-semibold lastItem"> {{ $paginator->lastItem() }}</span>
+                </p>
+            </div>
+        @endif
+
+        @if ($paginator->hasPages() && $recordCount != 'min')
+            <nav role="navigation" aria-label="Pagination Navigation" class="items-center justify-between sm:flex">
+                <div class="flex justify-center mt-2 md:flex-none md:justify-end sm:mt-0">
+
+                    @if (!$paginator->onFirstPage())
+                        <a class="px-4 py-2 flex items-center text-center bg-white border-gray-300 rounded-tl-md rounded-bl-md cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300"
+                            wire:click="gotoPage(1)">
+                            <x-livewire-powergrid::icons.chevron-double-left />
+                        </a>
+
+                        <a class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300"
+                            wire:click="previousPage" rel="next">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-chevron-compact-left" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
-                                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                    clip-rule="evenodd" />
+                                    d="M9.224 1.553a.5.5 0 0 1 .223.67L6.56 8l2.888 5.776a.5.5 0 1 1-.894.448l-3-6a.5.5 0 0 1 0-.448l3-6a.5.5 0 0 1 .67-.223z" />
                             </svg>
                         </a>
                     @endif
 
-                    {{-- Pagination Elements --}}
                     @foreach ($elements as $element)
-                        {{-- "Three Dots" Separator --}}
-                        @if (is_string($element))
-                            <span aria-disabled="true">
-                                <span
-                                    class="inline-flex relative items-center px-4 py-2 -ml-px text-sm font-medium leading-5 text-gray-700 bg-white border border-gray-300 cursor-default">{{ $element }}</span>
-                            </span>
-                        @endif
-
-                        {{-- Array Of Links --}}
                         @if (is_array($element))
                             @foreach ($element as $page => $url)
+                                {{-- @if ($paginator->currentPage() > 3 && $page === 2)
+                                    <div class="mx-1 mt-1 text-indigo-800 dark:text-indigo-300">
+                                        <span class="font-bold">.</span>
+                                        <span class="font-bold">.</span>
+                                        <span class="font-bold">.</span>
+                                    </div>
+                                @endif --}}
+
                                 @if ($page == $paginator->currentPage())
-                                    <span aria-current="page">
-                                        <span
-                                            class="inline-flex relative items-center px-4 py-2 -ml-px text-sm font-medium leading-5 text-white bg-blue-600 border border-gray-300 cursor-default">{{ $page }}</span>
-                                    </span>
-                                @else
-                                    <a href="{{ $url }}"
-                                        class="inline-flex relative items-center px-4 py-2 -ml-px text-sm font-medium leading-5 text-gray-700 bg-white border border-gray-300 ring-gray-300 transition duration-150 ease-in-out hover:text-gray-500 focus:z-10 focus:outline-none focus:ring focus:border-blue-300 active:bg-gray-100 active:text-gray-700"
-                                        aria-label="{{ __('Go to page :page', ['page' => $page]) }}">
-                                        {{ $page }}
-                                    </a>
+                                    <span
+                                        class="px-4 py-2 text-center bg-indigo-600 text-white border-indigo-400 cursor-pointer border-1 dark:bg-indigo-700 dark:text-white dark:text-indigo-300">{{ $page }}</span>
+                                @elseif (
+                                    $page === $paginator->currentPage() + 1 ||
+                                        $page === $paginator->currentPage() + 2 ||
+                                        $page === $paginator->currentPage() - 1 ||
+                                        $page === $paginator->currentPage() - 2)
+                                    <a class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300"
+                                        wire:click="gotoPage({{ $page }})">{{ $page }}</a>
                                 @endif
+
+                                {{-- @if ($paginator->currentPage() < $paginator->lastPage() - 2 && $page === $paginator->lastPage() - 1)
+                                    <div class="mx-1 mt-1 text-indigo-600 dark:text-indigo-300">
+                                        <span>.</span>
+                                        <span>.</span>
+                                        <span>.</span>
+                                    </div>
+                                @endif --}}
                             @endforeach
                         @endif
                     @endforeach
 
-                    {{-- Next Page Link --}}
                     @if ($paginator->hasMorePages())
-                        <a href="{{ $paginator->nextPageUrl() }}" rel="next"
-                            class="inline-flex relative items-center px-2 py-2 -ml-px text-sm font-medium leading-5 text-gray-500 bg-white rounded-r-md border border-gray-300 ring-gray-300 transition duration-150 ease-in-out hover:text-gray-400 focus:z-10 focus:outline-none focus:ring focus:border-blue-300 active:bg-gray-100 active:text-gray-500"
-                            aria-label="{{ __('pagination.next') }}">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    @else
-                        <span aria-disabled="true" aria-label="{{ __('pagination.next') }}">
-                            <span
-                                class="inline-flex relative items-center px-2 py-2 -ml-px text-sm font-medium leading-5 text-gray-500 bg-white rounded-r-md border border-gray-300 cursor-default"
-                                aria-hidden="true">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        @if ($paginator->lastPage() - $paginator->currentPage() >= 2)
+                            <a class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-indigo-100 dark:text-indigo-300"
+                                wire:click="nextPage" rel="next">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    fill="currentColor" class="bi bi-chevron-compact-right" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd" />
+                                        d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z" />
                                 </svg>
-                            </span>
-                        </span>
+                            </a>
+                        @endif
+                        <a class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 rounded-tr-md rounded-br-md cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300"
+                            wire:click="gotoPage({{ $paginator->lastPage() }})">
+                            <x-livewire-powergrid::icons.chevron-double-right />
+                        </a>
                     @endif
-                </span>
-            </div>
+                </div>
+            </nav>
+        @endif
+
+        <div>
+            @if ($paginator->hasPages() && $recordCount == 'min')
+                <nav role="navigation" aria-label="Pagination Navigation" class="items-center justify-between sm:flex">
+                    <div class="flex justify-center mt-2 md:flex-none md:justify-end sm:mt-0">
+                        <span>
+                            {{-- Previous Page Link Disabled --}}
+                            @if ($paginator->onFirstPage())
+                                <button disabled
+                                    class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                    <x-livewire-powergrid::icons.chevron-double-left />
+                                </button>
+                            @else
+                                @if (method_exists($paginator, 'getCursorName'))
+                                    <button
+                                        wire:click="setPage('{{ $paginator->previousCursor()->encode() }}','{{ $paginator->getCursorName() }}')"
+                                        wire:loading.attr="disabled"
+                                        class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                        <x-livewire-powergrid::icons.chevron-double-left />
+                                    </button>
+                                @else
+                                    <button wire:click="previousPage('{{ $paginator->getPageName() }}')"
+                                        wire:loading.attr="disabled"
+                                        class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                        <x-livewire-powergrid::icons.chevron-double-left />
+                                    </button>
+                                @endif
+                            @endif
+                        </span>
+
+                        <span>
+                            {{-- Next Page Link --}}
+                            @if ($paginator->hasMorePages())
+                                @if (method_exists($paginator, 'getCursorName'))
+                                    <button
+                                        wire:click="setPage('{{ $paginator->nextCursor()->encode() }}','{{ $paginator->getCursorName() }}')"
+                                        wire:loading.attr="disabled"
+                                        class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                        <x-livewire-powergrid::icons.chevron-double-right />
+                                    </button>
+                                @else
+                                    <button wire:click="nextPage('{{ $paginator->getPageName() }}')"
+                                        wire:loading.attr="disabled"
+                                        class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                        <x-livewire-powergrid::icons.chevron-double-right />
+                                    </button>
+                                @endif
+                            @else
+                                <button disabled
+                                    class="px-4 py-2 flex items-center text-center  bg-white border-gray-300 cursor-pointer border hover:bg-indigo-100 hover:border-gray-300 dark:text-indigo-300">
+                                    <x-livewire-powergrid::icons.chevron-double-right />
+                                </button>
+                            @endif
+                        </span>
+                    </div>
+                </nav>
+            @endif
         </div>
-    </nav>
-@endif
+    </div>
+</div>
