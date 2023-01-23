@@ -25,4 +25,9 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/schedules', \App\Http\Livewire\Schedules::class)->name('schedules');
+    Route::get('/rooms', \App\Http\Livewire\Rooms::class)->name('rooms');
+    Route::get('/professors', \App\Http\Livewire\Professors::class)->name('professors');
+    Route::get('/subjects', \App\Http\Livewire\Subjects::class)->name('subjects');
 });

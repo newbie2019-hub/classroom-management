@@ -5,6 +5,7 @@
         <div class="text-lg">
             {{ $title }}
         </div>
+        <p class="text-gray-700 text-sm">{{ $subtitle ?? ''}}</p>
 
         <div class="mt-4">
             {{ $content }}
