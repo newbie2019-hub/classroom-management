@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Professors') }}
+            {{ __('Schedules') }}
         </h2>
     </x-slot>
 
@@ -9,10 +9,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                 <div class="mb-4">
-                    <p class="text-lg text-medium">Professors Table</p>
-                    <p class="text-gray-600">Shown on the table are the data of the professors.</p>
+                    <p class="text-lg text-medium">Schedules Table</p>
+                    <p class="text-gray-600">Shown on the table are the schedules for the rooms.</p>
                 </div>
-                <livewire:professor-table />
             </div>
         </div>
     </div>

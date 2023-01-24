@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Subject;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Rules\{Rule, RuleActions};
 use PowerComponents\LivewirePowerGrid\Traits\ActionButton;
@@ -95,13 +96,9 @@ final class SubjectTable extends PowerGridComponent
                 return $model->professor?->first_name . ' ' . $model->professor?->last_name;
             })
             ->addColumn('subject')
-
-            /** Example of custom column using a closure **/
-            ->addColumn('subject_lower', function (Subject $model) {
-                return strtolower(e($model->subject));
+            ->addColumn('description', function(Subject $model){
+                return Str::words(e($model->description), 4);
             })
-
-            ->addColumn('description')
             ->addColumn('units')
             ->addColumn('created_at_formatted', fn (Subject $model) => Carbon::parse($model->created_at)->format('F j, Y h:i A'))
             ->addColumn('updated_at_formatted', fn (Subject $model) => Carbon::parse($model->updated_at)->format('F j, Y h:i A'));
@@ -156,7 +153,7 @@ final class SubjectTable extends PowerGridComponent
             Button::add('create')
                 ->class('inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring focus:ring-green-200 active:bg-green-600 disabled:opacity-25 transition')
                 ->caption('New Data')
-                ->emitTo('subject', 'showAddModal', []),
+                ->emitTo('subjects', 'showAddModal', []),
         ];
     }
     /*

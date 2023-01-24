@@ -19,7 +19,7 @@
 
     <x-jet-dialog-modal wire:model="addModal" max-width="md">
         <x-slot name="title">
-            {{ __('Update Data') }}
+            {{ __('Add Room') }}
         </x-slot>
         <x-slot name="subtitle">
             Please make sure that the data are valid and to fill-in all the fields.
@@ -56,7 +56,7 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-jet-secondary-button wire:click="$toggle('updateModal')" wire:loading.attr="disabled">
+            <x-jet-secondary-button wire:click="$toggle('addModal')" wire:loading.attr="disabled">
                 {{ __('Cancel') }}
             </x-jet-secondary-button>
 
