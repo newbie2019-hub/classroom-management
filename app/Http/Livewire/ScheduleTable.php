@@ -12,6 +12,8 @@ use PowerComponents\LivewirePowerGrid\{Button, Column, Exportable, Footer, Heade
 final class ScheduleTable extends PowerGridComponent
 {
     use ActionButton;
+    public string $sortField = 'date_from';
+    public string $sortDirection = 'asc';
 
     /*
     |--------------------------------------------------------------------------
@@ -44,13 +46,13 @@ final class ScheduleTable extends PowerGridComponent
     */
 
     /**
-    * PowerGrid datasource.
-    *
-    * @return Builder<\App\Models\Schedule>
-    */
+     * PowerGrid datasource.
+     *
+     * @return Builder<\App\Models\Schedule>
+     */
     public function datasource(): Builder
     {
-        return Schedule::query();
+        return Schedule::query()->with(['professor', 'room']);
     }
 
     /*
@@ -68,7 +70,18 @@ final class ScheduleTable extends PowerGridComponent
      */
     public function relationSearch(): array
     {
-        return [];
+        return [
+           'professor' => [
+                'first_name',
+                'last_name',
+           ],
+           'subject' => [
+                'subject',
+           ],
+           'room' => [
+                'room',
+           ],
+        ];
     }
 
     /*
@@ -86,17 +99,19 @@ final class ScheduleTable extends PowerGridComponent
     {
         return PowerGrid::eloquent()
             ->addColumn('id')
-            ->addColumn('room_id')
-            ->addColumn('professor_id')
-            ->addColumn('schedule')
-
-           /** Example of custom column using a closure **/
-            ->addColumn('schedule_lower', function (Schedule $model) {
-                return strtolower(e($model->schedule));
+            ->addColumn('room', function (Schedule $model) {
+                return e($model->room->room);
             })
-
-            ->addColumn('created_at_formatted', fn (Schedule $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->addColumn('updated_at_formatted', fn (Schedule $model) => Carbon::parse($model->updated_at)->format('d/m/Y H:i:s'));
+            ->addColumn('professor', function (Schedule $model) {
+                return e($model->professor->first_name) . ' ' . e($model->professor->last_name);
+            })
+            ->addColumn('subject', function (Schedule $model) {
+                return e($model->subject->subject);
+            })
+            ->addColumn('date_from', fn (Schedule $model) => Carbon::parse($model->date_from)->format('F j, Y h:i A'))
+            ->addColumn('date_to', fn (Schedule $model) => Carbon::parse($model->date_to)->format('F j, Y h:i A'))
+            ->addColumn('created_at_formatted', fn (Schedule $model) => Carbon::parse($model->created_at)->format('F j, Y h:i A'))
+            ->addColumn('updated_at_formatted', fn (Schedule $model) => Carbon::parse($model->updated_at)->format('F j, Y h:i A'));
     }
 
     /*
@@ -108,7 +123,7 @@ final class ScheduleTable extends PowerGridComponent
     |
     */
 
-     /**
+    /**
      * PowerGrid Columns.
      *
      * @return array<int, Column>
@@ -116,34 +131,35 @@ final class ScheduleTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('ID', 'id')
-                ->makeInputRange(),
+            Column::make('ID', 'id'),
 
-            Column::make('ROOM ID', 'room_id')
-                ->makeInputRange(),
+            Column::make('ROOM', 'room'),
 
-            Column::make('PROFESSOR ID', 'professor_id')
-                ->makeInputRange(),
+            Column::make('PROFESSOR', 'professor')->searchable(),
+            Column::make('SUBJECT', 'subject')->searchable(),
 
-            Column::make('SCHEDULE', 'schedule')
+            Column::make('DATE FROM', 'date_from')
                 ->sortable()
-                ->searchable()
-                ->makeInputText(),
+                ->searchable(),
+            Column::make('DATE TO', 'date_to')
+                ->sortable()
+                ->searchable(),
 
             Column::make('CREATED AT', 'created_at_formatted', 'created_at')
                 ->searchable()
-                ->sortable()
-                ->makeInputDatePicker(),
-
-            Column::make('UPDATED AT', 'updated_at_formatted', 'updated_at')
-                ->searchable()
-                ->sortable()
-                ->makeInputDatePicker(),
-
-        ]
-;
+                ->sortable(),
+        ];
     }
 
+    public function header(): array
+    {
+        return [
+            Button::add('create')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring focus:ring-green-200 active:bg-green-600 disabled:opacity-25 transition')
+                ->caption('New Data')
+                ->emitTo('schedules', 'showAddModal', []),
+        ];
+    }
     /*
     |--------------------------------------------------------------------------
     | Actions Method
@@ -152,27 +168,26 @@ final class ScheduleTable extends PowerGridComponent
     |
     */
 
-     /**
-     * PowerGrid Schedule Action Buttons.
+    /**
+     * PowerGrid Room Action Buttons.
      *
      * @return array<int, Button>
      */
 
-    /*
     public function actions(): array
     {
-       return [
-           Button::make('edit', 'Edit')
-               ->class('bg-indigo-500 cursor-pointer text-white px-3 py-2.5 m-1 rounded text-sm')
-               ->route('schedule.edit', ['schedule' => 'id']),
+        return [
+            Button::add('edit')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-100 focus:outline-none focus:border-green-200 focus:ring focus:ring-green-200 active:bg-green-200 disabled:opacity-25 transition')
+                ->caption('Update')
+                ->emitTo('schedules', 'showUpdateModal', ['key' => 'id']),
 
-           Button::make('destroy', 'Delete')
-               ->class('bg-red-500 cursor-pointer text-white px-3 py-2 m-1 rounded text-sm')
-               ->route('schedule.destroy', ['schedule' => 'id'])
-               ->method('delete')
+            Button::add('destroy')
+                ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-100 focus:outline-none focus:border-red-200 focus:ring focus:ring-red-200 active:bg-red-200 disabled:opacity-25 transition')
+                ->caption('Delete')
+                ->emitTo('schedules', 'showDeleteModal', ['key' => 'id']),
         ];
     }
-    */
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +197,7 @@ final class ScheduleTable extends PowerGridComponent
     |
     */
 
-     /**
+    /**
      * PowerGrid Schedule Action Rules.
      *
      * @return array<int, RuleActions>

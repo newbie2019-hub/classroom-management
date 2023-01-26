@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Professor;
+use App\Models\Room;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +26,10 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $roomCount = Room::count();
+        $profCount = Professor::count();
+        $subjectCount = Subject::count();
+        return view('dashboard', compact('roomCount', 'profCount', 'subjectCount'));
     })->name('dashboard');
 
     Route::get('/schedules', \App\Http\Livewire\Schedules::class)->name('schedules');

@@ -14,6 +14,7 @@ final class SubjectTable extends PowerGridComponent
 {
     use ActionButton;
 
+
     /*
     |--------------------------------------------------------------------------
     |  Features Setup

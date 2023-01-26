@@ -12,9 +12,109 @@
                     <p class="text-lg text-medium">Schedules Table</p>
                     <p class="text-gray-600">Shown on the table are the schedules for the rooms.</p>
                 </div>
+                <livewire:schedule-table />
             </div>
         </div>
     </div>
+
+    <!-- Update Modal -->
+    <x-jet-dialog-modal wire:model="addModal" max-width="md">
+        <x-slot name="title">
+            {{ __('Add Schedule') }}
+        </x-slot>
+        <x-slot name="subtitle">
+            Please make sure that the data are valid and to fill-in all the fields.
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="relative mt-4" id="room_id">
+                <select wire:model="schedule.room_id" required name="room_id"
+                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
+                    <option selected value="">
+                        Select Room
+                    </option>
+                    @forelse ($rooms as $room)
+                        <option value="{{ $room->id }}">
+                            {{ $room->room }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Rooms available.
+                        </option>
+                    @endforelse
+                </select>
+                <p
+                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
+                    Select Room</p>
+            </div>
+
+            <div class="relative mt-2" id="professor_id">
+                <select wire:model="schedule.professor_id" required name="professor_id"
+                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
+                    <option selected value="">
+                        Select Professor
+                    </option>
+                    @forelse ($professors as $professor)
+                        <option value="{{ $professor->id }}">
+                            {{ $professor->first_name . ' ' . $professor->last_name }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Professors added.
+                        </option>
+                    @endforelse
+                </select>
+                <p
+                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
+                    Select Professor</p>
+            </div>
+
+            <div class="relative mt-3" id="subject_id">
+                <select wire:model.debounce="schedule.subject_id" required name="subject_id"
+                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
+                    <option selected value="">
+                        Select Subject
+                    </option>
+                    @forelse ($subjects as $subject)
+                        <option value="{{ $subject->id }}">
+                            {{ $subject->subject }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Subject available.
+                        </option>
+                    @endforelse
+                </select>
+                <p
+                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
+                    Select Subject</p>
+            </div>
+
+            <div class="relative mt-2 mb-2.5">
+                <x-forms.floating-input wire:model="schedule.remarks" type="text" id="remarks" name="remarks"
+                    class="block w-full " />
+                <x-forms.floating-label for="remarks" :value="__('Remarks')" />
+            </div>
+
+            <x-datetime-picker :min="now()" min-time="06:00" max-time="21:00" parse-format="YYYY-MM-DD HH:mm"
+                interval="30" label="" id="date_from" class="mt-2.5 py-3 shadow-none text-gray-600"
+                placeholder="Date From" wire:model="schedule.date_from" />
+
+            <x-datetime-picker min="{{ now() }}" min-time="06:00" max-time="22:00"
+                parse-format="YYYY-MM-DD HH:mm" interval="30" id="date_to" label=""
+                class="mt-2.5 py-3 shadow-none text-gray-600" placeholder="Date To" wire:model="schedule.date_to" />
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('addModal')" wire:loading.attr="disabled">
+                {{ __('Cancel') }}
+            </x-jet-secondary-button>
+
+            <x-buttons.success-button class="ml-3" wire:click="store" wire:loading.attr="disabled">
+                {{ __('Save') }}
+            </x-buttons.success-button>
+        </x-slot>
+    </x-jet-dialog-modal>
 
     <!-- Update Modal -->
     <x-jet-dialog-modal wire:model="updateModal" max-width="md">
@@ -26,37 +126,83 @@
         </x-slot>
 
         <x-slot name="content">
-            <div class="relative mt-2">
-                <x-forms.floating-input wire:model.debounce="professor.first_name" type="text" id="first_name"
-                    name="first_name" class="block w-full " />
-                <x-forms.floating-label for="first_name" :value="__('First Name')" />
-            </div>
-            @error('professor.first_name')
-                <p id="outlined_error_help" class="mt-2 text-xs text-left text-red-600 dark:text-red-400">
-                    {{ $message }}</p>
-            @enderror
             <div class="relative mt-4">
-                <select wire:model.debounce="professor.gender" required name="gender" id="gender"
+                <select wire:model.debounce="schedule.room_id" required name="room_id" id="room_id"
                     class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
                     <option selected value="">
-                        Select Gender
+                        Select Room
                     </option>
-                    <option value="Male">
-                        Male
-                    </option>
-                    <option value="Female">
-                        Female
-                    </option>
+                    @forelse ($rooms as $room)
+                        <option value="{{ $room->id }}">
+                            {{ $room->room }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Rooms available.
+                        </option>
+                    @endforelse
                 </select>
                 <p
                     class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
-                    Select Gender</p>
+                    Select Room</p>
             </div>
-            @error('professor.gender')
-                <p id="outlined_error_help" class="mt-2 text-xs text-left text-red-600 dark:text-red-400">
-                    {{ $message }}</p>
-            @enderror
 
+            <div class="relative mt-4">
+                <select wire:model.debounce="schedule.professor_id" required name="professor_id" id="professor_id"
+                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
+                    <option selected value="">
+                        Select Professor
+                    </option>
+                    @forelse ($professors as $professor)
+                        <option value="{{ $professor->id }}">
+                            {{ $professor->first_name . ' ' . $professor->last_name }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Professors added.
+                        </option>
+                    @endforelse
+                </select>
+                <p
+                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
+                    Select Professor</p>
+            </div>
+
+            <div class="relative mt-4">
+                <select wire:model.debounce="schedule.subject_id" required name="subject_id" id="subject_id"
+                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
+                    <option selected value="">
+                        Select Subject
+                    </option>
+                    @forelse ($subjects as $subject)
+                        <option value="{{ $subject->id }}">
+                            {{ $subject->subject }}
+                        </option>
+                    @empty
+                        <option value="" disabled>
+                            No Subject available.
+                        </option>
+                    @endforelse
+                </select>
+                <p
+                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
+                    Select Professor</p>
+            </div>
+
+            <div class="relative mt-2">
+                <x-forms.floating-input wire:model.debounce="schedule.remarks" type="text" id="remarks"
+                    name="remarks" class="block w-full " />
+                <x-forms.floating-label for="remarks" :value="__('Remarks')" />
+            </div>
+
+            <x-datetime-picker :min="now()" id="date_from" min-time="06:00" max-time="21:00" label=""
+                interval="30" parse-format="YYYY-MM-DD HH:mm" class="mt-2.5 py-3 shadow-none text-gray-600"
+                placeholder="Date From" wire:model.defer="schedule.date_from" />
+
+            <x-datetime-picker min="{{ now() }}" id="date_to" min-time="06:00" max-time="22:00"
+                interval="30" parse-format="YYYY-MM-DD HH:mm" label=""
+                class="mt-2.5 py-3 shadow-none text-gray-600" placeholder="Date To"
+                wire:model.defer="schedule.date_to" />
         </x-slot>
 
         <x-slot name="footer">

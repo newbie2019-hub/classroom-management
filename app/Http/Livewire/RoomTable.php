@@ -131,10 +131,6 @@ final class RoomTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            // Column::make('IMAGE', 'image')
-            //     ->sortable()
-            //     ->searchable(),
-
             Column::make('CREATED AT', 'created_at_formatted', 'created_at')
                 ->searchable(),
 
