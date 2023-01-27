@@ -33,7 +33,7 @@
                     <p class="text-lg font-semibold">Schedules</p>
                     <p class="text-gray-600">Shown on the table are the schedules for the rooms.</p>
                 </div>
-                <livewire:schedule-table />
+                <livewire:dashboard-schedule />
             </div>
         </div>
     </div>
