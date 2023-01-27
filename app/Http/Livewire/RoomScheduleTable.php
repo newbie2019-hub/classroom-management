@@ -3,15 +3,17 @@
 namespace App\Http\Livewire;
 
 use App\Models\Room;
+use App\Models\Schedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Rules\{Rule, RuleActions};
 use PowerComponents\LivewirePowerGrid\Traits\ActionButton;
 use PowerComponents\LivewirePowerGrid\{Button, Column, Exportable, Footer, Header, PowerGrid, PowerGridComponent, PowerGridEloquent};
 
-final class RoomTable extends PowerGridComponent
+final class RoomScheduleTable extends PowerGridComponent
 {
     use ActionButton;
+    public $roomId;
 
     /*
     |--------------------------------------------------------------------------
@@ -44,13 +46,13 @@ final class RoomTable extends PowerGridComponent
     */
 
     /**
-     * PowerGrid datasource.
-     *
-     * @return Builder<\App\Models\Room>
-     */
+    * PowerGrid datasource.
+    *
+    * @return Builder<\App\Models\Room>
+    */
     public function datasource(): Builder
     {
-        return Room::query();
+        return Schedule::query()->with(['professor', 'room'])->where('room_id', $this->roomId);
     }
 
     /*
@@ -68,7 +70,18 @@ final class RoomTable extends PowerGridComponent
      */
     public function relationSearch(): array
     {
-        return [];
+        return [
+           'professor' => [
+                'first_name',
+                'last_name',
+           ],
+           'subject' => [
+                'subject',
+           ],
+           'room' => [
+                'room',
+           ],
+        ];
     }
 
     /*
@@ -86,12 +99,19 @@ final class RoomTable extends PowerGridComponent
     {
         return PowerGrid::eloquent()
             ->addColumn('id')
-            ->addColumn('room')
-
-            ->addColumn('description')
-            ->addColumn('location')
-            // ->addColumn('image')
-            ->addColumn('created_at_formatted', fn (Room $model) => Carbon::parse($model->created_at)->format('F j, Y h:i A'));
+            ->addColumn('room', function (Schedule $model) {
+                return e($model->room->room);
+            })
+            ->addColumn('professor', function (Schedule $model) {
+                return e($model->professor->first_name) . ' ' . e($model->professor->last_name);
+            })
+            ->addColumn('subject', function (Schedule $model) {
+                return e($model->subject->subject);
+            })
+            ->addColumn('date_from', fn (Schedule $model) => Carbon::parse($model->date_from)->format('F j, Y h:i A'))
+            ->addColumn('date_to', fn (Schedule $model) => Carbon::parse($model->date_to)->format('F j, Y h:i A'))
+            ->addColumn('created_at_formatted', fn (Schedule $model) => Carbon::parse($model->created_at)->format('F j, Y h:i A'))
+            ->addColumn('updated_at_formatted', fn (Schedule $model) => Carbon::parse($model->updated_at)->format('F j, Y h:i A'));
     }
 
     /*
@@ -111,24 +131,23 @@ final class RoomTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('ID', 'id')
-                ->hidden(),
+            Column::make('ID', 'id'),
 
-            Column::make('ROOM', 'room')
+            Column::make('ROOM', 'room'),
+
+            Column::make('PROFESSOR', 'professor')->searchable(),
+            Column::make('SUBJECT', 'subject')->searchable(),
+
+            Column::make('DATE FROM', 'date_from')
                 ->sortable()
                 ->searchable(),
-
-            Column::make('DESCRIPTION', 'description')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('LOCATION', 'location')
+            Column::make('DATE TO', 'date_to')
                 ->sortable()
                 ->searchable(),
 
             Column::make('CREATED AT', 'created_at_formatted', 'created_at')
-                ->searchable(),
-
+                ->searchable()
+                ->sortable(),
         ];
     }
 
@@ -138,7 +157,7 @@ final class RoomTable extends PowerGridComponent
             Button::add('create')
                 ->class('inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring focus:ring-green-200 active:bg-green-600 disabled:opacity-25 transition')
                 ->caption('New Data')
-                ->emitTo('rooms', 'showAddModal', []),
+                ->emitTo('schedules', 'showAddModal', []),
         ];
     }
     /*
@@ -158,20 +177,15 @@ final class RoomTable extends PowerGridComponent
     public function actions(): array
     {
         return [
-            Button::add('view')
-                ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-100 focus:outline-none focus:border-green-200 focus:ring focus:ring-green-200 active:bg-green-200 disabled:opacity-25 transition')
-                ->caption('View')
-                ->route('rooms.show', ['room' => 'id']),
-
             Button::add('edit')
                 ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-100 focus:outline-none focus:border-green-200 focus:ring focus:ring-green-200 active:bg-green-200 disabled:opacity-25 transition')
                 ->caption('Update')
-                ->emitTo('rooms', 'showUpdateModal', ['key' => 'id']),
+                ->emitTo('room-show', 'showUpdateModal', ['key' => 'id']),
 
             Button::add('destroy')
                 ->class('inline-flex items-center justify-center px-4 py-2 bg-transparent text-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-100 focus:outline-none focus:border-red-200 focus:ring focus:ring-red-200 active:bg-red-200 disabled:opacity-25 transition')
                 ->caption('Delete')
-                ->emitTo('rooms', 'showDeleteModal', ['key' => 'id']),
+                ->emitTo('room-show', 'showDeleteModal', ['key' => 'id']),
         ];
     }
 
@@ -183,7 +197,7 @@ final class RoomTable extends PowerGridComponent
     |
     */
 
-    /**
+     /**
      * PowerGrid Room Action Rules.
      *
      * @return array<int, RuleActions>

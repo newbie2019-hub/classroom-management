@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Schedules') }}
+            {{ __('Rooms') }}
         </h2>
     </x-slot>
 
@@ -9,10 +9,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                 <div class="mb-4">
-                    <p class="text-lg text-medium">Schedules Table</p>
-                    <p class="text-gray-600">Shown on the table are the schedules for the rooms.</p>
+                    <p class="text-lg text-medium">Rooms Schedule</p>
+                    <p class="text-gray-600">Shown on the table are the schedule for the rooms.</p>
                 </div>
-                <livewire:schedule-table />
+                <livewire:room-schedule-table :room-id="request()->route('room')" />
             </div>
         </div>
     </div>
@@ -27,27 +27,6 @@
         </x-slot>
 
         <x-slot name="content">
-            <div class="relative mt-4" id="room_id">
-                <select wire:model="schedule.room_id" required name="room_id"
-                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
-                    <option selected value="">
-                        Select Room
-                    </option>
-                    @forelse ($rooms as $room)
-                        <option value="{{ $room->id }}">
-                            {{ $room->room }}
-                        </option>
-                    @empty
-                        <option value="" disabled>
-                            No Rooms available.
-                        </option>
-                    @endforelse
-                </select>
-                <p
-                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
-                    Select Room</p>
-            </div>
-
             <div class="relative mt-2" id="professor_id">
                 <select wire:model="schedule.professor_id" required name="professor_id"
                     class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
@@ -126,27 +105,6 @@
         </x-slot>
 
         <x-slot name="content">
-            <div class="relative mt-4">
-                <select wire:model.debounce="schedule.room_id" required name="room_id" id="room_id"
-                    class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
-                    <option selected value="">
-                        Select Room
-                    </option>
-                    @forelse ($rooms as $room)
-                        <option value="{{ $room->id }}">
-                            {{ $room->room }}
-                        </option>
-                    @empty
-                        <option value="" disabled>
-                            No Rooms available.
-                        </option>
-                    @endforelse
-                </select>
-                <p
-                    class="absolute px-2 text-gray-600 duration-150 ease-in-out bg-white pointer-events-none left-2 peer-valid:left-1 peer-valid:top-0 peer-valid:-translate-y-2 top-3 peer-valid:text-xs">
-                    Select Room</p>
-            </div>
-
             <div class="relative mt-4">
                 <select wire:model.debounce="schedule.professor_id" required name="professor_id" id="professor_id"
                     class="block w-full p-3 text-sm text-gray-900 bg-transparent border-gray-300 rounded-lg appearance-none peer border dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600">
