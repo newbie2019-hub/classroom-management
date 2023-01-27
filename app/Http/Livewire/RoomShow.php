@@ -17,6 +17,9 @@ class RoomShow extends Component
 
     public $subjects;
     public $professors;
+    public $schedules;
+
+    public $events = [];
 
     public $roomId;
 
@@ -45,6 +48,16 @@ class RoomShow extends Component
         $this->professors = Professor::get(['id', 'first_name', 'last_name']);
         $this->subjects = Subject::get(['id', 'subject']);
         $this->roomId = request()->route('room');
+        $this->schedules = Schedule::where('room_id', $this->roomId)->get();
+
+
+        foreach ($this->schedules as $schedule) {
+            $this->events[] = [
+                'title' => $schedule->professor->first_name . ' ' . $schedule->professor->last_name,
+                'start' => $schedule->date_from,
+                'end' => $schedule->date_to,
+            ];
+        }
     }
 
     public function render()
@@ -85,7 +98,7 @@ class RoomShow extends Component
 
     public function updateComponent($msg = '', $title = '', $type = 'success')
     {
-        $this->emitTo(ScheduleTable::class, 'pg:eventRefresh-default');
+        $this->emitTo(RoomScheduleTable::class, 'pg:eventRefresh-default');
         $this->emit('showToastNotification', ['type' => $type, 'message' => $msg, 'title' => $title]);
     }
 

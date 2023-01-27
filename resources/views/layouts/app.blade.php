@@ -10,7 +10,7 @@
 
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">
-
+    <link rel='stylesheet' type="text/css" href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.7.1/fullcalendar.min.css'/>
     @wireUiScripts
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

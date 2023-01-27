@@ -12,6 +12,9 @@
                     <p class="text-lg text-medium">Rooms Schedule</p>
                     <p class="text-gray-600">Shown on the table are the schedule for the rooms.</p>
                 </div>
+                <div class="row mb-8">
+                    <div id="calendar"></div>
+                </div>
                 <livewire:room-schedule-table :room-id="request()->route('room')" />
             </div>
         </div>
@@ -193,4 +196,18 @@
             </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>
+
+    <script type="text/javascript" src="{{ URL::asset('js/full-calendar.global.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                slotMinTime: '6:00:00',
+                slotMaxTime: '22:00:00',
+                events: @json($events),
+            });
+            calendar.render();
+        });
+    </script>
 </div>
